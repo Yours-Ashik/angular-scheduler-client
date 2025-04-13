@@ -1,9 +1,12 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { NavbarComponent } from './navbar/navbar.component';
+import { HomeComponent } from './home/home.component';
+import { FullCalendarModule } from '@fullcalendar/angular';
+
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  imports: [ NavbarComponent,HomeComponent,FullCalendarModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
