@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FullCalendarModule } from '@fullcalendar/angular'; // FullCalendar
+import { FullCalendarModule } from '@fullcalendar/angular';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import timeGridPlugin from '@fullcalendar/timegrid';
@@ -8,48 +8,55 @@ import { HttpClient } from '@angular/common/http';
 
 @Component({
   selector: 'app-home',
+  standalone: true,
   imports: [CommonModule, FullCalendarModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
-export class HomeComponent {
-  calendarOptions = {
+export class HomeComponent implements OnInit {
+  calendarOptions: any = {
     plugins: [dayGridPlugin, timeGridPlugin, interactionPlugin],
-    initialView: 'dayGridMonth', // or 'timeGridDay' to see times
+    initialView: 'dayGridMonth',
     headerToolbar: {
       left: 'prev,next today',
       center: 'title',
       right: 'dayGridMonth,timeGridWeek,timeGridDay'
     },
-    timeZone: 'local', // or 'UTC', or 'Asia/Dhaka', etc.
-    events: [
-      {
-        title: 'Meeting',
-        start: '2025-04-14T10:00:00',
-        end: '2025-04-14T12:00:00'
-      }
-    ]
-  }
+    timeZone: 'local',
+    events: [] 
+  };
 
-  // handleDateClick(arg: any) {
-  //   alert('Date clicked: ' + arg.dateStr);
-  // }
+  scheduleList: any[] = [];
 
-  constructor(private http: HttpClient) {
-
-  }
-
-  scheduleList: any [] = [];
+  constructor(private http: HttpClient) {}
 
   ngOnInit(): void {
-    this.getUser();
+    this.getUserSchedules();
   }
 
-  getUser () {
-    this.http.get("http://localhost:5000/scheduleData").subscribe((result:any) => {
-      this.scheduleList = result
-      console.log(this.scheduleList)
-    })
+  getUserSchedules() {
+    this.http.get<any[]>('https://angular-task-server.vercel.app/scheduleData').subscribe(
+      (result) => {
+        this.scheduleList = result;
+
+        const events = this.scheduleList.map(item => ({
+          title: item.title,
+          start: `${item.startDate}T${item.startTime}`,
+          end: `${item.endDate}T${item.endTime}`,
+
+        }));
+        
+
+        
+        this.calendarOptions.events = events;
+      },
+      (error) => {
+        console.error('Error fetching schedule data:', error);
+      }
+    );
   }
 
+
+
+  
 }
